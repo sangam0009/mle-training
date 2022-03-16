@@ -21,5 +21,5 @@ The following techniques have been used:
 	-> conda env create -f env.yml
 4. After successfully installing all the required packages
 5. Download data from https://raw.githubusercontent.com/ageron/handson-ml/master/
-6. finally run main.py file.
+6. finally run nonstandarcode.py file.
  
