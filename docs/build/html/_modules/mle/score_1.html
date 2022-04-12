@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mle.score &mdash; mle_training 0.3 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> mle_training
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mle_training</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>mle.score</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mle.score</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">Config.config</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">Config.logger_config</span> <span class="kn">import</span> <span class="n">configure_logger</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s2">&quot;..&quot;</span><span class="p">))</span>
+
+
+<span class="c1"># configuring and assigning in the logger can be done by the below function</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">configure_logger</span><span class="p">()</span>
+
+<span class="n">PROCESSED_DATASET_PATH</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">MODEL_PATH</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="score_model"><a class="viewcode-back" href="../../mle.html#mle.score.score_model">[docs]</a><span class="k">def</span> <span class="nf">score_model</span><span class="p">(</span><span class="n">processed_dataset_path</span><span class="o">=</span><span class="n">PROCESSED_DATASET_PATH</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="n">MODEL_PATH</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;inside the score_model function&quot;</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">processed_dataset_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">train_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">processed_dataset_path</span><span class="p">,</span> <span class="s2">&quot;preprocessed_housing_train.csv&quot;</span><span class="p">)</span>
+    <span class="n">val_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">processed_dataset_path</span><span class="p">,</span> <span class="s2">&quot;preprocessed_housing_test.csv&quot;</span><span class="p">)</span>
+
+    <span class="n">train_set</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">train_csv_path</span><span class="p">)</span>
+    <span class="n">val_set</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">val_csv_path</span><span class="p">)</span>
+
+    <span class="n">train_set_labels</span> <span class="o">=</span> <span class="n">train_set</span><span class="p">[</span><span class="s2">&quot;median_house_value&quot;</span><span class="p">]</span>
+    <span class="n">train_set</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;median_house_value&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">val_set_labels</span> <span class="o">=</span> <span class="n">val_set</span><span class="p">[</span><span class="s2">&quot;median_house_value&quot;</span><span class="p">]</span>
+    <span class="n">val_set</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;median_house_value&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">train</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">test</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">model_path</span><span class="o">+</span><span class="s2">&quot;/*.pickle&quot;</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+
+        <span class="n">train_score</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">train_set_labels</span><span class="p">)</span>
+        <span class="n">test_score</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">val_set</span><span class="p">,</span> <span class="n">val_set_labels</span><span class="p">)</span>
+        <span class="n">train_score</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">train_score</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">test_score</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">test_score</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">train_score</span><span class="p">)</span>
+        <span class="n">test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_score</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_path</span><span class="o">+</span><span class="s2">&quot;/score.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Score for &quot;</span><span class="o">+</span><span class="n">file</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; : Train Score = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">train_score</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Test Score = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">test_score</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot;Score for &quot;</span><span class="o">+</span><span class="n">file</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; : Train Score = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">train_score</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Test Score = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">test_score</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">train</span><span class="p">,</span><span class="n">test</span><span class="p">]</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">configure_logger</span><span class="p">(</span><span class="n">log_file</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">logs_path</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="s2">&quot;to parse preprocessed data path and model path&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--processed_path&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path of the preprocessed train and test documents&quot;</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--model_path&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path where the model is stored&quot;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">processed_path</span><span class="p">:</span>
+        <span class="n">PROCESSED_DATASET_PATH</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">processed_path</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">PROCESSED_DATASET_PATH</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">processed_dataset_path</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_path</span><span class="p">:</span>
+        <span class="n">MODEL_PATH</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">model_path</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">MODEL_PATH</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">model_path</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start Calculating Score:&quot;</span><span class="p">)</span>
+    <span class="n">score_model</span><span class="p">(</span><span class="n">processed_dataset_path</span><span class="o">=</span><span class="n">PROCESSED_DATASET_PATH</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="n">MODEL_PATH</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished!&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Shikha Sinha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
